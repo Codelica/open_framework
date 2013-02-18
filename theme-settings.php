@@ -115,6 +115,27 @@ function open_framework_form_system_theme_settings_alter(&$form, &$form_state) {
     ),
   );
   
+  // Forms Section
+  $form['forms_container'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Forms'),
+    '#description' => t('Use these settings to adjust form display options.'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['forms_container']['form_input_block_level'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Apply Bootstrap "block-level" classes (full width) to form text inputs.'),
+    '#default_value' => theme_get_setting('form_input_block_level'),
+  );
+
+  $form['forms_container']['form_button_classes'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Apply Bootstrap button classes (primary, info, warning, etc.) to form buttons'),
+    '#default_value' => theme_get_setting('form_button_classes'),
+  );
+
   // Attach custom submit handler to the form
   $form['#submit'][] = 'open_framework_settings_submit';
   $form['#validate'][] = 'open_framework_settings_validate';

@@ -53,6 +53,52 @@ function open_framework_preprocess_page(&$vars) {
   
 }
 
+function open_framework_preprocess_button(&$vars) {
+  $vars['element']['#attributes']['class'][] = "btn";
+  if (theme_get_setting('form_button_classes') && $vars['element']['#type'] == "submit" && isset($vars['element']['#id'])) {
+    switch ($vars['element']['#id']) {
+      case "edit-add":
+        $vars['element']['#attributes']['class'][] = "btn-primary";
+        break;      
+      case "edit-submit":
+      case "edit-actions-submit":
+        $vars['element']['#attributes']['class'][] = "btn-success";
+        break;
+      case "edit-preview":
+        $vars['element']['#attributes']['class'][] = "btn-info";
+        break;
+      case "edit-clear":
+        $vars['element']['#attributes']['class'][] = "btn-warning";
+        break;
+      case "edit-delete":
+        $vars['element']['#attributes']['class'][] = "btn-danger";
+        break;
+    }
+  }
+}
+
+function open_framework_preprocess_textfield(&$vars) {
+  if (theme_get_setting('form_input_block_level')) $vars['element']['#attributes']['class'][] = "input-block-level";
+}
+
+function open_framework_preprocess_password(&$vars) {
+  if (theme_get_setting('form_input_block_level')) $vars['element']['#attributes']['class'][] = "input-block-level";
+}
+
+function open_framework_preprocess_textarea(&$vars) {
+  if (theme_get_setting('form_input_block_level')) $vars['element']['#attributes']['class'][] = "input-block-level";
+}
+
+function open_framework_element_info_alter(&$type) {
+  $type['checkbox']['#post_render'][] = 'open_framework_form_widget_classes';
+  $type['radio']['#post_render'][] = 'open_framework_form_widget_classes';
+}
+
+function open_framework_form_widget_classes($markup, $elements) {
+  $markup = str_replace('class="form-item', 'class="form-item '. $elements['#type'], $markup); 
+  return $markup;
+}
+
 function open_framework_preprocess_block(&$vars) {
   // Count number of blocks in a given theme region
 $vars['block_count'] = count(block_list($vars['block']->region));
