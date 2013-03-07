@@ -129,6 +129,7 @@ nav h2 {display: none;}
 /* ----- Second Sidebar Menu Blocks -- */
 
 /* ----- Admin Menu ------------------ */
+#admin-menu li {line-height: normal;}
 
 /* ----- Pager Nav ------------------- */
 
