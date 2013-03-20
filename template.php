@@ -483,7 +483,7 @@ function open_framework_item_list($variables) {
   $title = $variables['title'];
   $type = $variables['type'];
   $attributes = $variables['attributes'];
-  $output = '';
+  $output = '<div class="item-list">';
 
   if (isset($title)) {
     $output .= '<h3>' . $title . '</h3>';
@@ -526,6 +526,6 @@ function open_framework_item_list($variables) {
     }
     $output .= "</$type>";
   }
- 
+  $output .= '</div>';
   return $output;
 }
