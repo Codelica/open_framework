@@ -12,10 +12,9 @@ function open_framework_preprocess_html(&$vars) {
 
 function open_framework_preprocess_page(&$vars) {
 	  
-  // Update jquery version to 1.9.1 for non-administration pages
-  if (arg(0) != 'admin' && arg(1) != 'add' && arg(2) != 'edit' && arg(0) != 'panels' && arg(0) != 'ctools') {
-    $scripts = drupal_add_js(drupal_get_path('theme', 'open_framework') . '/js/jquery-1.9.1.min.js');
-	$scripts = drupal_add_js(drupal_get_path('theme', 'open_framework') . '/js/jquery-migrate-1.1.1.min.js');
+  // Update jquery version to 1.8.2 for non-administration pages
+  if (arg(0) != 'admin' && arg(0) != 'user' && arg(1) != 'add' && arg(2) != 'edit' && arg(0) != 'panels' && arg(0) != 'ctools') {
+    $scripts = drupal_add_js(drupal_get_path('theme', 'open_framework') . '/js/jquery-1.8.2.min.js');
     unset($scripts['core']['misc/jquery.js']);
     $vars['scripts'] = drupal_get_js('header', $scripts);
   }
@@ -344,41 +343,17 @@ function open_framework_menu_tree(&$vars) {
 /*
  * Implements hook_menu_link
  * Apply bootstrap menu classes to all menu blocks in the 
- * navigation region.
+ * navigation region and the main-menu block by default.
+ * Note: if a menu is in the navigation and somewhere else as well,
+ *       both instances of the menu will have the classes applied,
+ *       not just the one in the navigation
  */
 
 function open_framework_menu_link(array $vars) {
-  // Avoid calculating this array more than once
-  $navigation_blocks = &drupal_static(__FUNCTION__);
 
-  if (!isset($navigation_blocks)) {
-    // get all blocks in the navigation region
-    $blocks = block_list('navigation');
+  $element = $vars['element'];
 
-    // extract just their IDs (<module>_<delta>)
-    $ids = array_keys($blocks);
-
-    $navigation_blocks = array();
-
-    // create an array of theming function names based on the block
-    // IDs. This is so that we can then use these to compare with the
-    // theme function name that's passed with the individual links
-    foreach ($ids as $id) {
-    // we only recognize system, menu and menu_block blocks
-      $id = str_replace('system_',     '', $id);
-      $id = str_replace('menu_block_', '', $id);
-      $id = str_replace('menu_',       '', $id);
-
-      // use the same function used to create the name of theming function
-      $id = strtr($id, '-', '_');
-      $id = 'menu_link__' . $id;
-
-      $navigation_blocks[] = $id;
-    }
-  }
-
-  if ((in_array($vars['element']['#theme'], $navigation_blocks)) || ($vars['element']['#theme'] == 'menu_link__main_menu')) {
-    $element = $vars['element'];
+  if (open_framework_is_in_nav_menu($element)) {
     $sub_menu = '';
 
     if ($element['#below']) {
@@ -528,4 +503,97 @@ function open_framework_item_list($variables) {
   }
   $output .= '</div>';
   return $output;
+}
+
+/*
+ *  Find out if an element (a menu link) is a link displayed in the
+ *  navigation region for the user. We return true by default if this is a 
+ *  menu link in the main-menu. Open Framework treats the main-menu
+ *  as being in the navigation by default.
+ *  We are using the theming functions to figure out the block IDs.
+ *  The block IDs aren't passed to this function, but theming function names are,
+ *  and those are baed on the block ID.
+ *
+ */
+
+function open_framework_is_in_nav_menu($element) {
+
+  // #theme holds one or more suggestions for theming function names for the link
+  // simplify things by casting into an array
+  $link_theming_functions = (array)$element['#theme'];
+
+  // by default, we always assume that the main menu is in the navigation section
+  // 'menu_link__main_menu' is the theming function name for the main-menu
+  if (in_array('menu_link__main_menu', $link_theming_functions)) {
+    return TRUE;
+  };
+
+  // Avoid calculating this more than once
+  $nav_theming_functions = &drupal_static(__FUNCTION__);
+
+  // if not done yet, calculate the names of the theming function for all the blocks
+  // in the navigation region
+
+  if (!isset($nav_theming_functions)) {
+
+    // get all blocks in the navigation region
+    $blocks = block_list('navigation');
+
+	// Blocks placed using the context module don't show up using Drupal's block_list
+	// If context is enabled, see if it has placed any blocks in the navigation area
+	// See: http://drupal.org/node/785350
+    $context_blocks = array();
+	
+	if (module_exists('context')) {
+	  $reaction_block_plugin = context_get_plugin('reaction', 'block');
+	  $context_blocks = $reaction_block_plugin->block_list('navigation');
+	}
+
+    $blocks = array_merge($blocks, $context_blocks);
+
+    // extract just their IDs (<module>_<delta>)
+    $ids = array_keys($blocks);
+
+    // translate the ids into function names for comparison purposes
+    $nav_theming_functions = array_map('open_framework_block_id_to_function_name', $ids);
+
+  }
+
+  // Find out if any of the theming functions for the blocks are the same
+  // as the theming functions for the link.
+  $intersect = array_intersect($nav_theming_functions, $link_theming_functions);
+  if ((!empty($intersect))) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/*
+ *  Convert a block id to a theming function name
+ */
+
+function open_framework_block_id_to_function_name ($id) {
+  // if a system block, remove 'system_'
+  $id = str_replace('system_', '', $id);
+
+  // recognize menu and block_menu module blocks
+  if (strpos($id, 'menu_block_') === false) {
+    // if a menu block but not a menu_block block, remove menu_
+    $id = str_replace('menu_',       '', $id);
+  }
+  else {
+    // if a menu_block block, keep menu_block, but add an
+	// underscore. Not sure why this is different from other
+	// core modules
+    $id = str_replace('menu_block_', 'menu_block__', $id);
+  } 
+
+  // massage the id to looks like a theming function name
+  // use the same function used to create the name of theming function
+  $id = strtr($id, '-', '_');
+  $name = 'menu_link__' . $id;
+
+  return $name;
 }
