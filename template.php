@@ -8,6 +8,8 @@ function open_framework_preprocess_html(&$vars) {
   $vars['body_bg_type'] = theme_get_setting('body_bg_type'); 
   $vars['body_bg_classes'] = theme_get_setting('body_bg_classes'); 
   $vars['body_bg_path'] = theme_get_setting('body_bg_path'); 
+  $vars['form_input_block_level'] = theme_get_setting('form_input_block_level'); 
+  $vars['form_button_classes'] = theme_get_setting('form_button_classes'); 
 }
 
 function open_framework_js_alter(&$javascript) {
