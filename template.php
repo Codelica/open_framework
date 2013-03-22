@@ -14,7 +14,7 @@ function open_framework_preprocess_html(&$vars) {
 
 function open_framework_js_alter(&$javascript) {
   // Update jquery version for non-administration pages
-  if (arg(0) != 'admin' && arg(0) != 'panels' && arg(0) != 'ctools') {
+  if (arg(0) != 'admin' && arg(0) != 'user' && arg(1) != 'add' && arg(2) != 'edit' && arg(0) != 'panels' && arg(0) != 'ctools') {
     $jquery_file = drupal_get_path('theme', 'open_framework') . '/js/jquery-1.9.1.min.js';
     $jquery_version = '1.9.1';
     $migrate_file = drupal_get_path('theme', 'open_framework') . '/js/jquery-migrate-1.1.1.min.js';
