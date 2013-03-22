@@ -8,13 +8,11 @@ function open_framework_preprocess_html(&$vars) {
   $vars['body_bg_type'] = theme_get_setting('body_bg_type'); 
   $vars['body_bg_classes'] = theme_get_setting('body_bg_classes'); 
   $vars['body_bg_path'] = theme_get_setting('body_bg_path'); 
-  $vars['form_input_block_level'] = theme_get_setting('form_input_block_level'); 
-  $vars['form_button_classes'] = theme_get_setting('form_button_classes'); 
 }
 
 function open_framework_js_alter(&$javascript) {
   // Update jquery version for non-administration pages
-  if (arg(0) != 'admin' && arg(0) != 'user' && arg(1) != 'add' && arg(2) != 'edit' && arg(0) != 'panels' && arg(0) != 'ctools') {
+  if (arg(0) != 'admin' && arg(0) != 'panels' && arg(0) != 'ctools') {
     $jquery_file = drupal_get_path('theme', 'open_framework') . '/js/jquery-1.9.1.min.js';
     $jquery_version = '1.9.1';
     $migrate_file = drupal_get_path('theme', 'open_framework') . '/js/jquery-migrate-1.1.1.min.js';
@@ -32,7 +30,7 @@ function open_framework_js_alter(&$javascript) {
   }
 }
 
-function open_framework_preprocess_page(&$vars) {
+function open_framework_preprocess_page(&$vars) { 
   // Add page template suggestions based on the aliased path. For instance, if the current page has an alias of about/history/early, we'll have templates of:
   // page-about-history-early.tpl.php, page-about-history.tpl.php, page-about.tpl.php
   // Whichever is found first is the one that will be used.
@@ -76,52 +74,6 @@ function open_framework_preprocess_page(&$vars) {
   // Add variable for site title
   $vars['my_site_title'] = variable_get('site_name');
   
-}
-
-function open_framework_preprocess_button(&$vars) {
-  $vars['element']['#attributes']['class'][] = "btn";
-  if (theme_get_setting('form_button_classes') && $vars['element']['#type'] == "submit" && isset($vars['element']['#id'])) {
-    switch ($vars['element']['#id']) {
-      case "edit-add":
-        $vars['element']['#attributes']['class'][] = "btn-primary";
-        break;      
-      case "edit-submit":
-      case "edit-actions-submit":
-        $vars['element']['#attributes']['class'][] = "btn-success";
-        break;
-      case "edit-preview":
-        $vars['element']['#attributes']['class'][] = "btn-info";
-        break;
-      case "edit-clear":
-        $vars['element']['#attributes']['class'][] = "btn-warning";
-        break;
-      case "edit-delete":
-        $vars['element']['#attributes']['class'][] = "btn-danger";
-        break;
-    }
-  }
-}
-
-function open_framework_preprocess_textfield(&$vars) {
-  if (theme_get_setting('form_input_block_level')) $vars['element']['#attributes']['class'][] = "input-block-level";
-}
-
-function open_framework_preprocess_password(&$vars) {
-  if (theme_get_setting('form_input_block_level')) $vars['element']['#attributes']['class'][] = "input-block-level";
-}
-
-function open_framework_preprocess_textarea(&$vars) {
-  if (theme_get_setting('form_input_block_level')) $vars['element']['#attributes']['class'][] = "input-block-level";
-}
-
-function open_framework_element_info_alter(&$type) {
-  $type['checkbox']['#post_render'][] = 'open_framework_form_widget_classes';
-  $type['radio']['#post_render'][] = 'open_framework_form_widget_classes';
-}
-
-function open_framework_form_widget_classes($markup, $elements) {
-  $markup = str_replace('class="form-item', 'class="form-item '. $elements['#type'], $markup); 
-  return $markup;
 }
 
 function open_framework_preprocess_block(&$vars) {
@@ -475,7 +427,7 @@ function open_framework_item_list($variables) {
   $title = $variables['title'];
   $type = $variables['type'];
   $attributes = $variables['attributes'];
-  $output = '<div class="item-list">';
+  $output = '';
 
   if (isset($title)) {
     $output .= '<h3>' . $title . '</h3>';
@@ -518,7 +470,7 @@ function open_framework_item_list($variables) {
     }
     $output .= "</$type>";
   }
-  $output .= '</div>';
+ 
   return $output;
 }
 
