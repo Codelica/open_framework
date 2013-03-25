@@ -177,6 +177,25 @@ td{
 	display:inline-block;
 }
 
+/* corrections and improvements for form errors */
+.form-item div.form-radios.error, .form-item div.form-checkboxes.error, 
+.form-item div.image-widget.error, .form-item div.file-widget.error{
+  background: none;
+  padding: 2px 10px;
+  color: #333;
+  border: 2px solid red;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.form-item div.image-widget.error, .form-item div.file-widget.error{
+  padding: 10px
+}
+input.form-file.error {
+  border: none;
+  color: #333;
+}
+
 /* ----- other ----------------------- */
 hr{
 	clear:both;

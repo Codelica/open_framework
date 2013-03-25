@@ -130,6 +130,95 @@ function open_framework_form_widget_classes($markup, $elements) {
   return $markup;
 }
 
+// Correct bug in Drupal core -- errors are not highlighted for radio buttons.
+function open_framework_radios($variables) {
+  $element = $variables['element'];
+  $attributes = array();
+  if (isset($element['#id'])) {
+    $attributes['id'] = $element['#id'];
+  }
+  _form_set_class($element, array('form-radios'));
+  $attributes['class'] = $element['#attributes']['class'];
+  if (isset($element['#attributes']['title'])) {
+    $attributes['title'] = $element['#attributes']['title'];
+  }
+  return '<div' . drupal_attributes($attributes) . '>' . (!empty($element['#children']) ? $element['#children'] : '') . '</div>';
+}
+
+// Correct bug in Drupal core -- errors are not highlighted for checkboxes.
+function open_framework_checkboxes($variables) {
+  $element = $variables['element'];
+  $attributes = array();
+  if (isset($element['#id'])) {
+    $attributes['id'] = $element['#id'];
+  }
+  _form_set_class($element, array('form-checkboxes'));
+  $attributes['class'] = implode(' ', $element['#attributes']['class']);
+  if (isset($element['#attributes']['title'])) {
+    $attributes['title'] = $element['#attributes']['title'];
+  }
+  return '<div' . drupal_attributes($attributes) . '>' . (!empty($element['#children']) ? $element['#children'] : '') . '</div>';
+}
+
+// Wrap "image field" widgets with error class (when appropriate) for better themeing.
+function open_framework_image_widget($variables) {
+  $element = $variables['element'];
+  _check_child_errors($element);
+  _form_set_class($element, array('image-widget','form-managed-file','clearfix'));
+  $classes = implode(' ', $element['#attributes']['class']);
+  $output = '';
+  $output .= '<div class="' . $classes . '">';
+
+  if (isset($element['preview'])) {
+    $output .= '<div class="image-preview">';
+    $output .= drupal_render($element['preview']);
+    $output .= '</div>';
+  }
+
+  $output .= '<div class="image-widget-data">';
+  if ($element['fid']['#value'] != 0) {
+    $element['filename']['#markup'] .= ' <span class="file-size">(' . format_size($element['#file']->filesize) . ')</span> ';
+  }
+  $output .= drupal_render_children($element);
+  $output .= '</div>';
+  $output .= '</div>';
+
+  return $output;
+}
+
+// Wrap "file field" widgets with error class (when appropriate) for better themeing.
+function open_framework_file_widget($variables) {
+  $element = $variables['element'];
+  _check_child_errors($element);
+  _form_set_class($element, array('file-widget','form-managed-file','clearfix'));
+  $classes = implode(' ', $element['#attributes']['class']);
+  $output = '';
+  // The "form-managed-file" class is required for proper Ajax functionality.
+  $output .= '<div class="' . $classes . '">';
+  if ($element['fid']['#value'] != 0) {
+    // Add the file size after the file name.
+    $element['filename']['#markup'] .= ' <span class="file-size">(' . format_size($element['#file']->filesize) . ')</span> ';
+  }
+  $output .= drupal_render_children($element);
+  $output .= '</div>';
+
+  return $output;
+}
+
+// Helper function to add an error class to element if one of its children are in error.
+function _check_child_errors(&$element) {
+  $errors = form_get_errors();
+  if (is_array($errors)) {
+    foreach (element_children($element) as $child) {
+      $key = implode('][', $element[$child]['#parents']);
+      if (array_key_exists($key, $errors)) {
+        $element['#attributes']['class'][] = 'error';
+        break;
+      }
+    }
+  }
+}
+
 function open_framework_preprocess_block(&$vars) {
   // Count number of blocks in a given theme region
 $vars['block_count'] = count(block_list($vars['block']->region));
