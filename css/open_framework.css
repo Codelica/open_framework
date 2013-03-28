@@ -328,34 +328,53 @@ nav h2{
 	left:-10000px;
 }
 
-/* ----- secondary navigation -------- */
-.secondary-menu{
+/* ----- admin shortcuts / secondary menu -------- */
+.admin-shortcuts{
 	display:block;
 	padding:10px;
 	background:#eee;
 	font-size:12px;
 }
 
-.secondary-menu ul li, .secondary-menu ul li.leaf, .secondary-menu ul li.expanded, .secondary-menu ul li.collapsed{
+.admin-shortcuts ul.menu li, .admin-shortcuts ul.menu li.leaf, .admin-shortcuts ul.menu li.expanded, .admin-shortcuts ul.menu li.collapsed{
 	list-style:none;
 	list-style-image:none;
 }
 
-.secondary-menu ul{
+.admin-shortcuts ul.menu{
 	margin:0;
 }
 
-.secondary-menu ul li li{
-	margin:0;
-	padding:0;
-}
-
-.secondary-menu > ul > li{
+.admin-shortcuts ul.menu li{
 	display:inline-block;
+	position: relative;
 }
 
-.secondary-menu > ul > li > a{
+.admin-shortcuts ul.menu li li{
+	display:block;
+}
+
+.admin-shortcuts ul.menu li a{
 	background:none;
+}
+
+.admin-shortcuts ul.menu li ul{
+	display: none;
+}
+
+.admin-shortcuts ul.menu li:hover > ul{
+	display: block; 
+	background: #fff;
+	border: 1px solid #D4D4D4;
+	border-radius: 5px;
+	position: absolute;
+	width: 200px;
+}
+
+.admin-shortcuts ul.menu li li:hover > ul{
+	position: absolute; 
+	top: 5px;
+	left: 190px;
 }
 
 /* ----- breadcrumbs ----------------- */
@@ -541,7 +560,7 @@ img, a img{
 }
 
 .main .border-none img{
-	border:0;
+	border:0 !important;
 }
 
 .main .border-bottom img{
